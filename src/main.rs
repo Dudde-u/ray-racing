@@ -1,33 +1,29 @@
-mod structs;
-const IMAGE_HEIGHT: u32 = 2;
-const IMAGE_WIDTH: u32 = 3;
-const MAX_VALUE: u8 = 255;
-use glam::DVec3;
+use glam::{f64, DVec3};
 use itertools::Itertools;
-use std::{fs, io};
-fn main() -> io::Result<()> {
-    let pixels = (0..IMAGE_HEIGHT)
-        .cartesian_product(0..IMAGE_WIDTH)
-        .map(|(y, x)| {
-            let r = x as f64 / (IMAGE_WIDTH - 1) as f64;
-            let g = y as f64 / (IMAGE_HEIGHT - 1) as f64;
-            let b = 0.0;
-            format!("{} {} {}", r * 255.0, g * 255.0, b * 255.0)
-        })
-        .chunks(IMAGE_WIDTH as usize)
-        .into_iter()
-        .map(|chunk| chunk.into_iter().join(" "))
-        .join("\n");
-    println!("{}", pixels);
-    fs::write(
-        "output.ppm",
-        format!(
-            "P3
-{IMAGE_WIDTH} {IMAGE_HEIGHT}
-{MAX_VALUE}
-{pixels}
-"
-        ),
-    )?;
-    Ok(())
+mod structs;
+const MAX_VALUE: u8 = 255;
+const ASPECT_RATIO: f64 = 16. / 9.;
+const IMAGE_WIDTH: u32 = 400;
+const IMAGE_HEIGHT: u32 = (IMAGE_WIDTH as f64 / ASPECT_RATIO) as u32;
+const VIEWPORT_HEIGHT: f64 = 2.0;
+const VIEWPORT_WIDTH: f64 = VIEWPORT_HEIGHT * (IMAGE_WIDTH as f64 / IMAGE_HEIGHT as f64);
+const FOCAL_LENGTH: f64 = 1.0;
+const CAMERA_CENTER: DVec3 = DVec3::ZERO;
+const VIEWPORT_U: DVec3 = DVec3::new(VIEWPORT_WIDTH, 0., 0.);
+const VIEWPORT_V: DVec3 = DVec3::new(0., -VIEWPORT_HEIGHT, 0.);
+fn main() {
+    let pixel_delta_u: DVec3 = VIEWPORT_U / IMAGE_WIDTH as f64;
+    let pixel_delta_v: DVec3 = VIEWPORT_V / IMAGE_HEIGHT as f64;
+    let viewport_upper_left: DVec3 =
+        CAMERA_CENTER - DVec3::new(0., 0., FOCAL_LENGTH) - VIEWPORT_U / 2. - VIEWPORT_V / 2.;
+    let viewport_upper_left: DVec3 =
+        CAMERA_CENTER - DVec3::new(0., 0., FOCAL_LENGTH) - VIEWPORT_U / 2. - VIEWPORT_V / 2.;
+    let pixel00_loc: DVec3 = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
+    for j in 0..IMAGE_HEIGHT {
+        for i in 0..IMAGE_WIDTH {
+            let pixel_center =
+                pixel00_loc + (i as f64 * pixel_delta_u) + (j as f64 * pixel_delta_v);
+            let ray_direction = pixel_center - CAMERA_CENTER;
+        }
+    }
 }
