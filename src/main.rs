@@ -32,11 +32,16 @@ fn main() -> io::Result<()> {
                 direction: ray_direction,
             };
             let pixel_color = ray.color() * 255.;
-            pixels += &format!("{} {} {} \n", pixel_color.x, pixel_color.y, pixel_color.z);
+            pixels += &format!(
+                "{} {} {} \n",
+                pixel_color.x.round() as u16,
+                pixel_color.y.round() as u16,
+                pixel_color.z.round() as u16
+            );
         }
     }
     fs::write(
-        "output0",
+        "output0.ppm",
         format!(
             "P3
 {IMAGE_WIDTH} {IMAGE_HEIGHT}
