@@ -31,7 +31,7 @@ fn main() -> io::Result<()> {
                 origin: CAMERA_CENTER,
                 direction: ray_direction,
             };
-            let pixel_color = ray.color() * 255.;
+            let pixel_color = ray.color_of_ray() * 255.;
             pixels += &format!(
                 "{} {} {} \n",
                 pixel_color.x.round() as u16,
@@ -41,7 +41,7 @@ fn main() -> io::Result<()> {
         }
     }
     fs::write(
-        "output0.ppm",
+        "output1.ppm",
         format!(
             "P3
 {IMAGE_WIDTH} {IMAGE_HEIGHT}
@@ -52,4 +52,15 @@ fn main() -> io::Result<()> {
     )?;
 
     Ok(())
+}
+pub fn has_hit_sphere(center: &DVec3, radius: f64, ray: &Ray) -> bool {
+    let oc = *center - ray.origin;
+    let a = ray.direction.dot(ray.direction);
+    let b = (-2.0) * ray.direction.dot(oc);
+    let c = oc.dot(oc) - radius * radius;
+    let diskriminant: f64 = b * b - 4. * a * c;
+    if diskriminant >= 0. {
+        return true;
+    }
+    return false;
 }
