@@ -35,7 +35,7 @@ impl Camera {
             pixel_delta_u,
             pixel_delta_v,
             pixel00_loc: viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v),
-            samples_per_pixel: 420,
+            samples_per_pixel: 15,
         }
     }
     pub fn get_ray(&self, i: u32, j: u32) -> Ray {
@@ -57,7 +57,10 @@ impl Camera {
         let mut pixels = String::new();
         for j in 0..self.image_height {
             for i in 0..self.image_width {
-                let pixel_color = self.get_ray(i, j).color(&scene) * 255.;
+                let mut pixel_color = self.get_ray(i, j).color(&scene) * 255.;
+                for _p in 1..self.samples_per_pixel {
+                    pixel_color += self.get_ray(i, j).color(&scene);
+                }
                 pixels += &format!(
                     "{} {} {} \n",
                     pixel_color.x.round() as u16,

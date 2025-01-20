@@ -14,7 +14,7 @@ impl Ray {
     where
         T: Hittable,
     {
-        if let Some(rec) = world.hit(self, 0., INFINITY) {
+        if let Some(rec) = world.hit(self, 0.001, INFINITY) {
             return 0.5 * (rec.normal + DVec3::new(1., 1., 1.));
         }
         let unit_direction: DVec3 = self.direction.normalize();

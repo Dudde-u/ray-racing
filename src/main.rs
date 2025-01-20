@@ -3,17 +3,17 @@ use glam::{f64, DVec3};
 use structs::*;
 mod camera;
 mod structs;
-use std::{fs, io};
+use std::io;
 const MAX_VALUE: u16 = 255;
 const ASPECT_RATIO: f64 = 16. / 9.;
 const IMAGE_WIDTH: u32 = 400;
+const SCENE_NUMBER: &str = "3";
 
 fn main() -> io::Result<()> {
     let camera: Camera = Camera::new(IMAGE_WIDTH, ASPECT_RATIO, MAX_VALUE);
     let mut scene = HittableList {
         elements: Vec::new(),
     };
-
     scene.add(Sphere {
         center: DVec3::new(0., 0., -0.8),
         radius: 0.5,
@@ -22,7 +22,7 @@ fn main() -> io::Result<()> {
         center: DVec3::new(0., -100.5, -10.),
         radius: 100.,
     });
-    camera.render_picture(scene, "3")?;
+    camera.render_picture(scene, SCENE_NUMBER)?;
     Ok(())
 }
 //used earlier
