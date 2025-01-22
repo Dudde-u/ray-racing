@@ -25,7 +25,10 @@ impl Ray {
                 origin: rec.p,
                 direction,
             };
-            return 0.5 * ray.color(world, recursive_depth - 1);
+            //not really "reflection rate" but gives a good representation of what happens to the
+            //picture
+            let reflection_rate: f64 = 0.6;
+            return reflection_rate * ray.color(world, recursive_depth - 1);
         }
         let unit_direction: DVec3 = self.direction.normalize();
         let a = 0.5 * (unit_direction.y + 1.);
