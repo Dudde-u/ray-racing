@@ -2,11 +2,11 @@ use crate::structs::*;
 use glam::DVec3;
 use rand::prelude::*;
 use std::{fs, io};
+const RECURSIVE_DEPTH: u32 = 25;
 pub struct Camera {
     image_width: u32,
     image_height: u32,
     max_value: u16,
-    aspect_ratio: f64,
     center: DVec3,
     pixel_delta_u: DVec3,
     pixel_delta_v: DVec3,
@@ -30,7 +30,6 @@ impl Camera {
             image_width,
             image_height: (image_width as f64 / aspect_ratio) as u32,
             center: DVec3::ZERO,
-            aspect_ratio,
             max_value,
             pixel_delta_u,
             pixel_delta_v,
@@ -57,9 +56,9 @@ impl Camera {
         let mut pixels = String::new();
         for j in 0..self.image_height {
             for i in 0..self.image_width {
-                let mut pixel_color = self.get_ray(i, j).color(&scene) * 255.;
+                let mut pixel_color = self.get_ray(i, j).color(&scene, RECURSIVE_DEPTH) * 255.;
                 for _p in 1..self.samples_per_pixel {
-                    pixel_color += self.get_ray(i, j).color(&scene);
+                    //pixel_color += 0.3 * self.get_ray(i, j).color(&scene, 1);
                 }
                 pixels += &format!(
                     "{} {} {} \n",

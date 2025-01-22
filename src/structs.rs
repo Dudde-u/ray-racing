@@ -1,4 +1,5 @@
 use crate::has_hit_sphere;
+use crate::utilites_for_rand;
 use glam::DVec3;
 use std::f64::INFINITY;
 pub struct Ray {
@@ -9,18 +10,28 @@ impl Ray {
     pub fn at(&self, t: f64) -> DVec3 {
         self.origin + t * self.direction
     }
-    //used for earlier parts of render
-    pub fn color<T>(&self, world: &T) -> DVec3
+    pub fn color<T>(&self, world: &T, recursive_depth: u32) -> DVec3
     where
         T: Hittable,
     {
-        if let Some(rec) = world.hit(self, 0.001, INFINITY) {
-            return 0.5 * (rec.normal + DVec3::new(1., 1., 1.));
+        if recursive_depth <= 0 {
+            return DVec3::new(0., 0., 0.);
+            //break here and return something
+        }
+        if let Some(rec) = world.hit(self, 0.0001, INFINITY) {
+            let direction: DVec3 =
+                utilites_for_rand::random_checked_vector(&self.direction.normalize());
+            let ray = Ray {
+                origin: rec.p,
+                direction,
+            };
+            return 0.5 * ray.color(world, recursive_depth - 1);
         }
         let unit_direction: DVec3 = self.direction.normalize();
         let a = 0.5 * (unit_direction.y + 1.);
         return (1. - a) * DVec3::new(1., 1., 1.) + a * DVec3::new(0.5, 0.7, 1.);
     }
+    //"deprecated"
     pub fn color_of_ray(&self) -> DVec3 {
         if has_hit_sphere(&DVec3::new(0., 0., -1.), 0.5, &self) {
             return DVec3::new(1., 0., 0.);
