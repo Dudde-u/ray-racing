@@ -2,7 +2,7 @@ use crate::structs::*;
 use glam::DVec3;
 use rand::prelude::*;
 use std::{fs, io};
-const RECURSIVE_DEPTH: u32 = 25;
+const RECURSIVE_DEPTH: u32 = 1000;
 pub struct Camera {
     image_width: u32,
     image_height: u32,
@@ -40,10 +40,13 @@ impl Camera {
     pub fn get_ray(&self, i: u32, j: u32) -> Ray {
         let pixel_center =
             self.pixel00_loc + (i as f64 * self.pixel_delta_u) + (j as f64 * self.pixel_delta_v);
+        // I'm an idiot, had two different random numbers be one
         let t1 = thread_rng().gen::<f64>() - 0.5;
-        let sample_square: DVec3 = (t1 * self.pixel_delta_u) + (t1 * self.pixel_delta_v);
+        let t2 = thread_rng().gen::<f64>() - 0.5;
+        let sample_square: DVec3 = (t1 * self.pixel_delta_u) + (t2 * self.pixel_delta_v);
         let pixel_sample = pixel_center + sample_square;
-        let ray_direction = pixel_sample - self.center;
+        let ray_origin = self.center;
+        let ray_direction = pixel_sample - ray_origin;
         Ray {
             origin: self.center,
             direction: ray_direction,
@@ -56,15 +59,19 @@ impl Camera {
         let mut pixels = String::new();
         for j in 0..self.image_height {
             for i in 0..self.image_width {
-                let mut pixel_color = self.get_ray(i, j).color(&scene, RECURSIVE_DEPTH) * 255.;
+                let mut pixel_color = self.get_ray(i, j).color(&scene, RECURSIVE_DEPTH);
                 for _p in 1..self.samples_per_pixel {
-                    //pixel_color += 0.3 * self.get_ray(i, j).color(&scene, 1);
+                    pixel_color += self.get_ray(i, j).color(&scene, RECURSIVE_DEPTH);
                 }
+                //forgot this initially
+                let scale_factor = (self.samples_per_pixel as f64).recip();
+                pixel_color *= scale_factor;
+                pixel_color *= 255.;
                 pixels += &format!(
                     "{} {} {} \n",
-                    pixel_color.x.round() as u16,
-                    pixel_color.y.round() as u16,
-                    pixel_color.z.round() as u16
+                    (pixel_color.x.round()) as u16,
+                    (pixel_color.y.round()) as u16,
+                    (pixel_color.z.round()) as u16
                 );
             }
         }

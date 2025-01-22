@@ -8,7 +8,7 @@ use std::io;
 const MAX_VALUE: u16 = 255;
 const ASPECT_RATIO: f64 = 16. / 9.;
 const IMAGE_WIDTH: u32 = 400;
-const SCENE_NUMBER: &str = "4";
+const SCENE_NUMBER: &str = "5";
 
 fn main() -> io::Result<()> {
     let camera: Camera = Camera::new(IMAGE_WIDTH, ASPECT_RATIO, MAX_VALUE);

@@ -18,9 +18,9 @@ impl Ray {
             return DVec3::new(0., 0., 0.);
             //break here and return something
         }
-        if let Some(rec) = world.hit(self, 0.0001, INFINITY) {
+        if let Some(rec) = world.hit(self, 0.01, INFINITY) {
             let direction: DVec3 =
-                utilites_for_rand::random_checked_vector(&self.direction.normalize());
+                rec.normal + utilites_for_rand::random_checked_vector(&self.direction.normalize());
             let ray = Ray {
                 origin: rec.p,
                 direction,
